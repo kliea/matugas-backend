@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // PUBLIC APIs
 
 Route::post('/login',  [AuthController::class, 'login'])->name('user.login');
-Route::post('/signup',  [AuthController::class, 'signup'])->name('user.signup');
+Route::post('/signup',  [AuthController::class, 'login'])->name('user.signup');
 
 
 Route::middleware(['auth:sanctum'])->group(function () {

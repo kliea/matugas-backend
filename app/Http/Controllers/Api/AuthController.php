@@ -51,7 +51,7 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
-        $token = $user->createToken($request->email)->plainTextToken;
+        $token = $user->createToken($request->email);
 
         return response()->json([
             'user' => $user,
