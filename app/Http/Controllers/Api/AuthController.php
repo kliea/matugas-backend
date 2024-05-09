@@ -6,17 +6,19 @@ use App\Models\User;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
     /**
-     * Show a list of all of the application's users.
+     * Display the specified resource.
      */
-    public function index()
+    public function show(Request $request)
     {
-        return User::all();
+        $user = $request->user();
+        return $user;
     }
 
     /**
@@ -26,12 +28,19 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        // Check if the user exists
+        if (!$user) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['The provided email does not exist.'],
             ]);
         }
 
+        // Check if the password is correct
+        if (!Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'password' => ['The provided password is incorrect.'],
+            ]);
+        }
         $token = $user->createToken($request->email)->plainTextToken;
 
         return response()->json([
@@ -51,7 +60,7 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
-        $token = $user->createToken($request->email);
+        $token = $user->createToken($request->email)->plainTextToken;
 
         return response()->json([
             'user' => $user,
